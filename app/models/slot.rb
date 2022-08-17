@@ -1,5 +1,6 @@
 class Slot < ApplicationRecord
     has_many :slot_collections
+    SLOT_DURATION = 15 #minutes
     SLOT_MINUTES_OPTIONS = [0, 15, 30, 45]
 
     validates :total_capacity, :start_time, :end_time, presence: true
@@ -7,6 +8,38 @@ class Slot < ApplicationRecord
     validate :start_time_must_be_before_end_time
     validate :date_cannot_be_in_the_past
     validate :date_minutes
+
+    after_create :generate_slot_collections
+
+    def generate_slot_collections
+        capacities_to_be_alloted = total_capacity
+        slot_collection_start_time = start_time
+
+        available_slots_in_selected_duration.downto(1) do |available_slot|
+            slot_capacity = capacities_to_be_alloted / available_slot
+            slot_collection_end_time = slot_collection_start_time + SLOT_DURATION.minutes
+
+            # create associated slot collection
+            slot_collections.create(capacity: slot_capacity,
+             start_time: slot_collection_start_time,
+             end_time: slot_collection_end_time)
+
+            slot_collection_start_time = slot_collection_end_time
+            capacities_to_be_alloted -= slot_capacity
+        end
+    end
+
+    def available_slots_in_selected_duration
+        (time_duration_in_minutes / SLOT_DURATION).to_i
+    end
+
+    def time_duration_in_minutes
+        time_duration / 1.minutes
+    end
+
+    def time_duration
+        end_time - start_time
+    end
 
     private
 
