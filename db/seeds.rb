@@ -5,3 +5,4 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+# slot1 = Slot.create(duration: 15, start_time: '2022-08-22 11:00:00', end_time: '2022-08-22 12:00:00', total_capacity: 6)

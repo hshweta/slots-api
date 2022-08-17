@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  slot: one
+  capacity: 
+  start_time: 2022-08-16 15:45:49
+  end_time: 2022-08-16 15:45:49
+
+two:
+  slot: two
+  capacity: 
+  start_time: 2022-08-16 15:45:49
+  end_time: 2022-08-16 15:45:49
