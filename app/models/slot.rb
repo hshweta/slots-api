@@ -8,6 +8,11 @@ class Slot < ApplicationRecord
     validate :start_time_must_be_before_end_time
     validate :date_cannot_be_in_the_past
     validate :date_minutes
+    validate :slot_not_taken
+
+    scope :overlapping, ->(start_time, end_time) {
+            where(["start_time <= ? and ? <= end_time", end_time, start_time ])
+        }
 
     after_create :generate_slot_collections
 
@@ -72,6 +77,12 @@ class Slot < ApplicationRecord
 
         if end_time.present? && SLOT_MINUTES_OPTIONS.exclude?(end_time.min)
             errors.add(:end_time, :allowed_minutes_options, minutes: SLOT_MINUTES_OPTIONS.join(', '))
+        end
+    end
+
+    def slot_not_taken
+        if start_time.present? && end_time.present?
+            errors.add(:start_time, :slot_taken) if Slot.overlapping(start_time, end_time).exists?
         end
     end
 end
