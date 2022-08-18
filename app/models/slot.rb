@@ -41,6 +41,12 @@ class Slot < ApplicationRecord
         end_time - start_time
     end
 
+    def as_json(options={})
+        super(except: [:created_at, :updated_at],
+            include: [slot_collections: { except: [:created_at, :updated_at]}]
+        )
+    end
+
     private
 
     def start_time_must_be_before_end_time
