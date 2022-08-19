@@ -1,5 +1,5 @@
 class Slot < ApplicationRecord
-    has_many :slot_collections
+    has_many :slot_collections, dependent: :destroy
     SLOT_DURATION = 15 #minutes
     SLOT_MINUTES_OPTIONS = [0, 15, 30, 45]
 
