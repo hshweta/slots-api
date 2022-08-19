@@ -59,9 +59,38 @@ class SlotTest < ActiveSupport::TestCase
 
   test "should create slot with required attributes" do
     slot = Slot.new(total_capacity: 5,
-      start_time: 1.day.from_now.change({ min: 0}),
-      end_time: 1.day.from_now.change({ min: 30})
+      start_time: 2.days.from_now.change({ min: 0}),
+      end_time: 2.days.from_now.change({ min: 30})
     )
     assert slot.valid?
+  end
+
+  test "should create slot collections after creating slot" do
+    st = 7.days.from_now.change({ min: 0})
+    et = 7.days.from_now.change({ min: 30})
+    slot = Slot.create(total_capacity: 5,
+      start_time: st,
+      end_time: et
+    )
+
+    # check the associated slot collections are created
+    assert slot.slot_collections.exists?
+
+    # for mentioned duration i.e. 30 minutes,
+    # with 15 minutes slot duration, it should create 2 slot collections
+    assert_equal slot.slot_collections.count, 2
+
+    # check values of corresponding fields
+    first_slot_collection = slot.slot_collections.first
+    assert_equal first_slot_collection[:slot_id], slot.id
+    assert_equal first_slot_collection[:capacity], 2
+    assert_equal first_slot_collection[:start_time], st
+    assert_equal first_slot_collection[:end_time], st + Slot::SLOT_DURATION.minutes
+
+    second_slot_collection = slot.slot_collections.last
+    assert_equal second_slot_collection[:slot_id], slot.id
+    assert_equal second_slot_collection[:capacity], 3
+    assert_equal second_slot_collection[:start_time], st + Slot::SLOT_DURATION.minutes
+    assert_equal second_slot_collection[:end_time], et
   end
 end
